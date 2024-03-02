@@ -16,14 +16,14 @@ class AutonomousCarController:
 
     def move_straight(self, total_distance):
         # Define the linear velocity for moving straight
-        linear_velocity = 0.8 # adjust as needed
+        linear_velocity = 1  # adjust as needed
 
-        actual_velocity=28.0
+        actual_velocity= 28 
 
         # Calculate the time needed to cover the specified distance
 
         time_with_constant_vel = total_distance / actual_velocity
-        time_to_accerelate = 2*(actual_velocity)/9.24 # get the distance to accerelate  and minus it from total distance 
+        time_to_accerelate = (actual_velocity)/ 4.41 # get the distance to accerelate  and minus it from total distance 
         time_to_move = time_with_constant_vel + time_to_accerelate
 
         # Create a Twist message to set linear velocity
@@ -33,7 +33,9 @@ class AutonomousCarController:
         # Publish the command to move straight
         start_time = rospy.get_time()
         while (not rospy.is_shutdown()) and (rospy.get_time() - start_time) < time_to_move:
-            self.cmd_vel_pub.publish(move_cmd)
+            throttle_value = Float64()
+            throttle_value.data = 0.56
+            self.cmd_vel_pub.publish(throttle_value)
             rospy.loginfo(time_to_move)
             rospy.loginfo(rospy.get_time() - start_time)
             
@@ -41,7 +43,7 @@ class AutonomousCarController:
 
         # Stop the car by publishing a brake command
         brake_cmd = Float64()
-        brake_cmd.data = 0.99
+        brake_cmd.data = 1
         self.cmd_vel_pub.publish(0.0)
         self.brakes_pub.publish(brake_cmd)
         self.cmd_vel_pub.publish(0)
