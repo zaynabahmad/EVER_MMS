@@ -12,18 +12,18 @@ class AutonomousCarController:
         self.brakes_pub = rospy.Publisher('/brakes', Float64, queue_size=10)
 
         # Set the rate 
-        self.rate = rospy.Rate(10)  # 10 Hz
+        self.rate = rospy.Rate(5)  # 10 Hz
 
     def move_straight(self, total_distance):
         # Define the linear velocity for moving straight
-        linear_velocity = 1.0  # adjust as needed
+        linear_velocity = 0.8 # adjust as needed
 
-        actual_velocity=15.15
+        actual_velocity=28.0
 
         # Calculate the time needed to cover the specified distance
 
         time_with_constant_vel = total_distance / actual_velocity
-        time_to_accerelate = 2*(actual_velocity)/9.2 # get the distance to accerelate  and minus it from total distance 
+        time_to_accerelate = 2*(actual_velocity)/9.24 # get the distance to accerelate  and minus it from total distance 
         time_to_move = time_with_constant_vel + time_to_accerelate
 
         # Create a Twist message to set linear velocity
@@ -41,7 +41,8 @@ class AutonomousCarController:
 
         # Stop the car by publishing a brake command
         brake_cmd = Float64()
-        brake_cmd.data = 1.0 
+        brake_cmd.data = 0.99
+        self.cmd_vel_pub.publish(0.0)
         self.brakes_pub.publish(brake_cmd)
         self.cmd_vel_pub.publish(0)
         self.rate.sleep()
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     try:
         controller = AutonomousCarController()
         # Move the car straight for 75 meters
-        controller.move_straight(75.0)
+        controller.move_straight(75.0) # 1 meter for the dec 
         rospy.spin()
 
     except rospy.ROSInterruptException:
